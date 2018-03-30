@@ -358,6 +358,11 @@ contains
     !$omp end parallel do
   end subroutine wake_continuity
 
+  subroutine solvewake_CB2D(wake_array,dt,dissip_const)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
+    real(dp),intent(in) :: dt, dissip_const
+  end subroutine solvewake_CB2D
+
   subroutine age_wake(wake_array,dt)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
     real(dp),intent(in) :: dt
