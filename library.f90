@@ -325,6 +325,37 @@ contains
     call wake_continuity(wake_array)
   end subroutine convectwake
 
+  subroutine convectwake_CB2D(wake_array,wake_array_AB,wake_array_prev,dissip_const)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
+    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
+    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_prev
+    real(dp),intent(in) :: dt, dissip_const
+    real(dp) :: dissip_term
+    integer :: i,j,rows,cols
+
+    rows=size(wake_array,1)
+    cols=size(wake_array,2)
+
+    ! Assign coordinates to r matrices
+
+    ! Finite difference part
+    do j=1,cols
+      do i=1,rows
+        dissip_term = wake_array(i-1,j)-2._dp*wake_array(i+1,j)-2._dp*wake_array(i,j)+wake_array_prev(i+2,j)+wake_array_prev(i+1,j)
+        wake_array(i,j)=wake_array_AB(i,j)+0.5_dp*dissip_const*(dissip_term)
+      enddo
+    enddo
+
+    ! divide by (1-0.5*gam)
+
+    ! Handle edge cases
+
+    ! Assign to wake points
+
+    call wake_continuity(wake_array)
+  end subroutine convectwake_CB2D
+
+
   ! Maintain continuity between vortex ring elements after convection
   ! of vortex ring corners
   subroutine wake_continuity(wake_array)
@@ -357,11 +388,6 @@ contains
     enddo
     !$omp end parallel do
   end subroutine wake_continuity
-
-  subroutine solvewake_CB2D(wake_array,dt,dissip_const)
-    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
-    real(dp),intent(in) :: dt, dissip_const
-  end subroutine solvewake_CB2D
 
   subroutine age_wake(wake_array,dt)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
