@@ -166,27 +166,50 @@ contains
   end subroutine init_wake
 
   ! Converts coordinates of panel array(m x n) to a matrix(m+1 x n+1)
-  subroutine panels2mat(panel_array,mat)
-    type(wakepanel_class), intent(in), dimension(:,:) :: panel_array
-    real(dp), intent(out), dimension(3,size(panel_array,1)+1,size(panel_array,2)+1) :: mat
+  subroutine wake2mat(wake_array,mat)
+    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array
+    real(dp), intent(out), dimension(3,size(wake_array,1)+1,size(wake_array,2)+1) :: mat
     integer :: i, j, rows, cols
 
-    rows = size(panel_array,1)
-    cols = size(panel_array,2)
+    rows = size(wake_array,1)
+    cols = size(wake_array,2)
 
     do j=1,cols
       do i=1,rows
-        mat(:,i+1,j)=panel_array(i,j)%vr%vf(2)%fc(:,1)
+        mat(:,i+1,j)=wake_array(i,j)%vr%vf(2)%fc(:,1)
       enddo
     enddo
     do i=1,rows
-      mat(:,i+1,cols+1)=panel_array(i,cols)%vr%vf(3)%fc(:,1)
+      mat(:,i+1,cols+1)=wake_array(i,cols)%vr%vf(3)%fc(:,1)
     enddo
     do j=1,cols
-      mat(:,1,j)=panel_array(1,j)%vr%vf(1)%fc(:,1)
+      mat(:,1,j)=wake_array(1,j)%vr%vf(1)%fc(:,1)
     enddo
-    mat(:,1,cols+1)=panel_array(1,cols)%vr%vf(4)%fc(:,1)
-  end subroutine panels2mat
+    mat(:,1,cols+1)=wake_array(1,cols)%vr%vf(4)%fc(:,1)
+  end subroutine wake2mat
+
+  ! Converts values from a matrix(m+1 x n+1) to coordinates of panel array(m x n)
+  subroutine mat2wake(wake_array,mat)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
+    real(dp), intent(in), dimension(3,size(wake_array,1)+1,size(wake_array,2)+1) :: mat
+    integer :: i, j, rows, cols
+
+    rows = size(wake_array,1)
+    cols = size(wake_array,2)
+
+    do j=1,cols
+      do i=1,rows
+        wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
+      enddo
+    enddo
+    do i=1,rows
+      wake_array(i,cols)%vr%assignP(2,mat(:,i+1,cols+1))
+    enddo
+    do j=1,cols
+      wake_array(1,j)%vr%assignP(2,mat(:,1,j))
+    enddo
+    wake_array(1,cols)%vr%assignP(2,mat(:,1,cols+1))
+  end subroutine mat2wake
 
   !--------------------------------------------------------!
   !                 Wing Motion Functions                  !
@@ -357,49 +380,32 @@ contains
     real(dp), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_now, r_AB
     real(dp), dimension(size(wake_array_prev,1)+1,size(wake_array_prev,2)+1) :: r_prev
 
-    real(dp) :: dissip_term
+    real(dp), dimension(3) :: dissip_term  ! For  the 3 coordinates
     integer :: i,j,rows,cols
 
     rows=size(wake_array,1)
     cols=size(wake_array,2)
 
     ! Assign coordinates to r matrices
-    do j=1,cols
-      do i=1,rows
-        r_now(i+1,j) =    wake_array(i,j)%vr%vf(2)%fc(:,1)
-        r_AB(i+1,j)  = wake_array_AB(i,j)%vr%vf(2)%fc(:,1)
-      enddo
-    enddo
-    do i=1,rows
-      r_now(i,cols+1) =    wake_array(i,j)%vr%vf(3)%fc(:,1)
-      r_AB(i,cols+1)  = wake_array_AB(i,j)%vr%vf(3)%fc(:,1)
-    enddo
-    do j=1,cols
-      r_now(i,cols+1) =    wake_array(i,j)%vr%vf(3)%fc(:,1)
-      r_AB(i,cols+1)  = wake_array_AB(i,j)%vr%vf(3)%fc(:,1)
-    enddo
-
-    do j=1,cols
-      do i=1,rows
-        r_now(i+1,j) =    wake_array(i,j)%vr%vf(2)%fc(:,1)
-        r_AB(i+1,j) = wake_array_AB(i,j)%vr%vf(2)%fc(:,1)
-      enddo
-    enddo
+    call wake2mat(wake_array,r_now)
+    call wake2mat(wake_array_AB,r_AB)
+    call wake2mat(wake_array_prev,r_prev)
 
 
     ! Finite difference part
     do j=1,cols
       do i=1,rows
-        dissip_term = wake_array(i-1,j)-2._dp*wake_array(i+1,j)-2._dp*wake_array(i,j)+wake_array_prev(i+2,j)+wake_array_prev(i+1,j)
-        wake_array(i,j)=wake_array_AB(i,j)+0.5_dp*dissip_const*(dissip_term)
+        dissip_term = r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
+        r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
       enddo
     enddo
 
-    ! divide by (1-0.5*gam)
-
     ! Handle edge cases
 
-    ! Assign to wake points
+    r_now=r_now/(1._dp-0.5_dp*dissip_const)
+
+    ! Assign back to wake points
+    call mat2wake(wake_array,r_now)
 
     call wake_continuity(wake_array)
   end subroutine convectwake_CB2D
