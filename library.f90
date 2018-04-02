@@ -371,6 +371,7 @@ contains
     call wake_continuity(wake_array)
   end subroutine convectwake
 
+
   subroutine convectwake_CB2D(wake_array,wake_array_AB,wake_array_prev,dissip_const)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
     type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
@@ -391,18 +392,29 @@ contains
     call wake2mat(wake_array_AB,r_AB)
     call wake2mat(wake_array_prev,r_prev)
 
-
-    ! Finite difference part
-    do j=1,cols
-      do i=1,rows
-        dissip_term = r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
-        r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
+    if (rows>5) then
+      ! Finite difference part
+      do j=1,cols+1
+        do i=2,rows-2
+          dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
+          r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
+        enddo
       enddo
-    enddo
+      r_now=r_now/(1._dp-0.5_dp*dissip_const)
 
-    ! Handle edge cases
+      do j=1,cols+1
+        r_now(:,1,j)=r_AB(:,1,j)
+      enddo
 
-    r_now=r_now/(1._dp-0.5_dp*dissip_const)
+      ! Use AB2 for last 3 rows of coordinates
+      do j=1,cols+1
+        do i=rows-1,rows+1
+          r_now(:,i,j)=r_AB(:,i,j) 
+        enddo
+      enddo
+    else
+      r_now=r_AB
+    endif
 
     ! Assign back to wake points
     call mat2wake(wake_array,r_now)
