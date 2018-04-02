@@ -165,6 +165,29 @@ contains
 
   end subroutine init_wake
 
+  ! Converts coordinates of panel array(m x n) to a matrix(m+1 x n+1)
+  subroutine panels2mat(panel_array,mat)
+    type(wakepanel_class), intent(in), dimension(:,:) :: panel_array
+    real(dp), intent(out), dimension(3,size(panel_array,1)+1,size(panel_array,2)+1) :: mat
+    integer :: i, j, rows, cols
+
+    rows = size(panel_array,1)
+    cols = size(panel_array,2)
+
+    do j=1,cols
+      do i=1,rows
+        mat(:,i+1,j)=panel_array(i,j)%vr%vf(2)%fc(:,1)
+      enddo
+    enddo
+    do i=1,rows
+      mat(:,i+1,cols+1)=panel_array(i,cols)%vr%vf(3)%fc(:,1)
+    enddo
+    do j=1,cols
+      mat(:,1,j)=panel_array(1,j)%vr%vf(1)%fc(:,1)
+    enddo
+    mat(:,1,cols+1)=panel_array(1,cols)%vr%vf(4)%fc(:,1)
+  end subroutine panels2mat
+
   !--------------------------------------------------------!
   !                 Wing Motion Functions                  !
   !--------------------------------------------------------!
@@ -330,6 +353,10 @@ contains
     type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
     type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_prev
     real(dp),intent(in) :: dt, dissip_const
+
+    real(dp), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_now, r_AB
+    real(dp), dimension(size(wake_array_prev,1)+1,size(wake_array_prev,2)+1) :: r_prev
+
     real(dp) :: dissip_term
     integer :: i,j,rows,cols
 
@@ -337,6 +364,28 @@ contains
     cols=size(wake_array,2)
 
     ! Assign coordinates to r matrices
+    do j=1,cols
+      do i=1,rows
+        r_now(i+1,j) =    wake_array(i,j)%vr%vf(2)%fc(:,1)
+        r_AB(i+1,j)  = wake_array_AB(i,j)%vr%vf(2)%fc(:,1)
+      enddo
+    enddo
+    do i=1,rows
+      r_now(i,cols+1) =    wake_array(i,j)%vr%vf(3)%fc(:,1)
+      r_AB(i,cols+1)  = wake_array_AB(i,j)%vr%vf(3)%fc(:,1)
+    enddo
+    do j=1,cols
+      r_now(i,cols+1) =    wake_array(i,j)%vr%vf(3)%fc(:,1)
+      r_AB(i,cols+1)  = wake_array_AB(i,j)%vr%vf(3)%fc(:,1)
+    enddo
+
+    do j=1,cols
+      do i=1,rows
+        r_now(i+1,j) =    wake_array(i,j)%vr%vf(2)%fc(:,1)
+        r_AB(i+1,j) = wake_array_AB(i,j)%vr%vf(2)%fc(:,1)
+      enddo
+    enddo
+
 
     ! Finite difference part
     do j=1,cols
