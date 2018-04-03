@@ -259,14 +259,18 @@ program main
         call convectwake(wake(row_now:nt,:),vind_wake(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
       elseif (iter == 2) then
-        call wake2mat(wake(row_now:nt,:),r_prev(row_now:nt+1,:)) !!! WTF?!!
+        call wake2mat(wake_array(row_now:nt,:),r_prev(:,row_now:nt+1,:))
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
       else
+        call wake2mat(wake_array(row_now:nt,:),r_now(:,row_now:nt+1,:))
+        r_prev_dummy(:,row_now:nt+1,:)=r_now(:,row_now:nt+1,:)
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
+        call convectwake_CB2D(wake_array(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),dissip_const)
+        r_prev(:,row_now:nt+1,:)=r_prev_dummy(:,row_now:nt+1,:)
       endif
 
     case (4)    ! Predictor-Corrector Adam-Bashforth (4th order)
@@ -294,31 +298,31 @@ program main
 
         if (iter < init_wake_vel_nt .or. init_wake_vel_nt .ne. 0)  Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
 
-      vind_wake_step =09._dp/24._dp*Pvind_wake  & 
-        +19._dp/24._dp* vind_wake  & 
-        -05._dp/24._dp* vind_wake3 &  
-        +01._dp/24._dp* vind_wake2  
-      call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
+        vind_wake_step =09._dp/24._dp*Pvind_wake  & 
+          +19._dp/24._dp* vind_wake  & 
+          -05._dp/24._dp* vind_wake3 &  
+          +01._dp/24._dp* vind_wake2  
+        call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
 
-      vind_wake1=vind_wake2
-      vind_wake2=vind_wake3
-      vind_wake3=vind_wake
-    endif
+        vind_wake1=vind_wake2
+        vind_wake2=vind_wake3
+        vind_wake3=vind_wake
+      endif
 
-  end select
+    end select
 
-  ! Strain wake
-  if (wakestrain_switch .eq. 1) call strain_wake(wake(row_now:nt,:))
+    ! Strain wake
+    if (wakestrain_switch .eq. 1) call strain_wake(wake(row_now:nt,:))
 
-  ! Store shed vortex as TE for next wake panel
-  if (row_now>1) call assignshed(wake(row_now-1,:),wing(nc,:),'TE')  
+    ! Store shed vortex as TE for next wake panel
+    if (row_now>1) call assignshed(wake(row_now-1,:),wing(nc,:),'TE')  
 
-enddo
+  enddo
 
-! Postprocesing
-call lift2file(lift,'Results/lift.curve',(/dt,om_body(3),span,vwind(1)/))
-call drag2file(drag,'Results/drag.curve',(/dt,om_body(3),span,vwind(1)/))
+  ! Postprocesing
+  call lift2file(lift,'Results/lift.curve',(/dt,om_body(3),span,vwind(1)/))
+  call drag2file(drag,'Results/drag.curve',(/dt,om_body(3),span,vwind(1)/))
 
-if (wakeplot_switch .eq. 1) call mesh2file(wing,wake(row_now:nt,:),'Results/wNw'//timestamp//'.tec')
+  if (wakeplot_switch .eq. 1) call mesh2file(wing,wake(row_now:nt,:),'Results/wNw'//timestamp//'.tec')
 
 end program main

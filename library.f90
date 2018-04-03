@@ -372,15 +372,13 @@ contains
   end subroutine convectwake
 
 
-  subroutine convectwake_CB2D(wake_array,wake_array_AB,wake_array_prev,dissip_const)
-    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
-    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
-    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array_prev
-    real(dp),intent(in) :: dt, dissip_const
+  subroutine convectwake_CB2D(wake_array_AB,r_now,r_prev,dissip_const)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
+    real(dp), intent(in), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_now
+    real(dp), intent(in), dimension(size(wake_array_prev,1)+1,size(wake_array_prev,2)+1) :: r_prev
+    real(dp), intent(in) :: dissip_const
 
-    real(dp), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_now, r_AB
-    real(dp), dimension(size(wake_array_prev,1)+1,size(wake_array_prev,2)+1) :: r_prev
-
+    real(dp), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_AB
     real(dp), dimension(3) :: dissip_term  ! For  the 3 coordinates
     integer :: i,j,rows,cols
 
@@ -388,33 +386,27 @@ contains
     cols=size(wake_array,2)
 
     ! Assign coordinates to r matrices
-    call wake2mat(wake_array,r_now)
     call wake2mat(wake_array_AB,r_AB)
-    call wake2mat(wake_array_prev,r_prev)
 
-    if (rows>5) then
-      ! Finite difference part
-      do j=1,cols+1
-        do i=2,rows-2
-          dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
-          r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
-        enddo
+    ! Finite difference part
+    do j=1,cols+1
+      do i=2,rows-1
+        dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
+        r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
       enddo
-      r_now=r_now/(1._dp-0.5_dp*dissip_const)
+    enddo
+    r_now=r_now/(1._dp-0.5_dp*dissip_const)
 
-      do j=1,cols+1
-        r_now(:,1,j)=r_AB(:,1,j)
-      enddo
+    do j=1,cols+1
+      r_now(:,1,j)=r_AB(:,1,j)
+    enddo
 
-      ! Use AB2 for last 3 rows of coordinates
-      do j=1,cols+1
-        do i=rows-1,rows+1
-          r_now(:,i,j)=r_AB(:,i,j) 
-        enddo
+    ! Use AB2 for last 3 rows of coordinates
+    do j=1,cols+1
+      do i=rows,rows+1
+        r_now(:,i,j)=r_AB(:,i,j) 
       enddo
-    else
-      r_now=r_AB
-    endif
+    enddo
 
     ! Assign back to wake points
     call mat2wake(wake_array,r_now)
