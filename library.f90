@@ -199,16 +199,16 @@ contains
 
     do j=1,cols
       do i=1,rows
-        wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
+        call wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
       enddo
     enddo
     do i=1,rows
-      wake_array(i,cols)%vr%assignP(2,mat(:,i+1,cols+1))
+      call wake_array(i,cols)%vr%assignP(2,mat(:,i+1,cols+1))
     enddo
     do j=1,cols
-      wake_array(1,j)%vr%assignP(2,mat(:,1,j))
+      call wake_array(1,j)%vr%assignP(2,mat(:,1,j))
     enddo
-    wake_array(1,cols)%vr%assignP(2,mat(:,1,cols+1))
+    call wake_array(1,cols)%vr%assignP(2,mat(:,1,cols+1))
   end subroutine mat2wake
 
   !--------------------------------------------------------!

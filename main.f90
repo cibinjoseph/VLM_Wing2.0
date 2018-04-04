@@ -259,17 +259,17 @@ program main
         call convectwake(wake(row_now:nt,:),vind_wake(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
       elseif (iter == 2) then
-        call wake2mat(wake_array(row_now:nt,:),r_prev(:,row_now:nt+1,:))
+        call wake2mat(wake(row_now:nt,:),r_prev(:,row_now:nt+1,:))
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
       else
-        call wake2mat(wake_array(row_now:nt,:),r_now(:,row_now:nt+1,:))
+        call wake2mat(wake(row_now:nt,:),r_now(:,row_now:nt+1,:))
         r_prev_dummy(:,row_now:nt+1,:)=r_now(:,row_now:nt+1,:)
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
-        call convectwake_CB2D(wake_array(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),dissip_const)
+        call convectwake_CB2D(wake(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),0.2_dp)
         r_prev(:,row_now:nt+1,:)=r_prev_dummy(:,row_now:nt+1,:)
       endif
 
