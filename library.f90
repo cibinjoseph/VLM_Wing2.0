@@ -374,16 +374,16 @@ contains
 
   subroutine convectwake_CB2D(wake_array_AB,r_now,r_prev,dissip_const)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
-    real(dp), intent(in), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_now
-    real(dp), intent(in), dimension(size(wake_array_prev,1)+1,size(wake_array_prev,2)+1) :: r_prev
+    real(dp), intent(inout), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_now
+    real(dp), intent(in), dimension(3,size(wake_array_AB,1),size(wake_array_AB,2)) :: r_prev
     real(dp), intent(in) :: dissip_const
 
-    real(dp), dimension(size(wake_array,1)+1,size(wake_array,2)+1) :: r_AB
+    real(dp), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_AB
     real(dp), dimension(3) :: dissip_term  ! For  the 3 coordinates
     integer :: i,j,rows,cols
 
-    rows=size(wake_array,1)
-    cols=size(wake_array,2)
+    rows=size(wake_array_AB,1)
+    cols=size(wake_array_AB,2)
 
     ! Assign coordinates to r matrices
     call wake2mat(wake_array_AB,r_AB)
@@ -392,7 +392,7 @@ contains
     do j=1,cols+1
       do i=2,rows-1
         dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
-        r_now(:,i,j)=r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term)
+        r_now(:,i,j)=(r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term))
       enddo
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
@@ -409,9 +409,9 @@ contains
     enddo
 
     ! Assign back to wake points
-    call mat2wake(wake_array,r_now)
+    call mat2wake(wake_array_AB,r_now)
 
-    call wake_continuity(wake_array)
+    call wake_continuity(wake_array_AB)
   end subroutine convectwake_CB2D
 
 
