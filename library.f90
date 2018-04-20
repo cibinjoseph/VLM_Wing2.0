@@ -178,12 +178,10 @@ contains
       do i=1,rows
         mat(:,i+1,j)=wake_array(i,j)%vr%vf(2)%fc(:,1)
       enddo
+      mat(:,1,j)=wake_array(1,j)%vr%vf(1)%fc(:,1)
     enddo
     do i=1,rows
       mat(:,i+1,cols+1)=wake_array(i,cols)%vr%vf(3)%fc(:,1)
-    enddo
-    do j=1,cols
-      mat(:,1,j)=wake_array(1,j)%vr%vf(1)%fc(:,1)
     enddo
     mat(:,1,cols+1)=wake_array(1,cols)%vr%vf(4)%fc(:,1)
   end subroutine wake2mat
@@ -201,12 +199,10 @@ contains
       do i=1,rows
         call wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
       enddo
+      call wake_array(1,j)%vr%assignP(2,mat(:,1,j))
     enddo
     do i=1,rows
       call wake_array(i,cols)%vr%assignP(2,mat(:,i+1,cols+1))
-    enddo
-    do j=1,cols
-      call wake_array(1,j)%vr%assignP(2,mat(:,1,j))
     enddo
     call wake_array(1,cols)%vr%assignP(2,mat(:,1,cols+1))
   end subroutine mat2wake
@@ -390,16 +386,13 @@ contains
 
     ! Finite difference part
     do j=1,cols+1
+      r_now(:,1,j)=r_AB(:,1,j)
       do i=2,rows-1
         dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
         r_now(:,i,j)=(r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term))
       enddo
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
-
-    do j=1,cols+1
-      r_now(:,1,j)=r_AB(:,1,j)
-    enddo
 
     ! Use AB2 for last 3 rows of coordinates
     do j=1,cols+1
@@ -431,11 +424,6 @@ contains
         call wake_array(i,j)%vr%assignP(3,wake_array(i,j+1)%vr%vf(2)%fc(:,1))
         call wake_array(i,j)%vr%assignP(4,wake_array(i-1,j+1)%vr%vf(2)%fc(:,1))
       enddo
-    enddo
-    !$omp end parallel do
-
-    !$omp parallel do
-    do j=1,cols-1
       call wake_array(1,j)%vr%assignP(3,wake_array(1,j+1)%vr%vf(2)%fc(:,1))
     enddo
     !$omp end parallel do
