@@ -23,12 +23,10 @@ contains
       do i=1,nx
         wing_mesh(:,i,j)=wing_array(i,j)%pc(:,1)
       enddo
+      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     do i=1,nx
       wing_mesh(:,i,ny+1)=wing_array(i,ny)%pc(:,4)
-    enddo
-    do j=1,ny
-      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     wing_mesh(:,nx+1,ny+1)=wing_array(nx,ny)%pc(:,3)
 
@@ -53,13 +51,11 @@ contains
       do i=1,nx
         wake_mesh(:,i,j)=wake_array(i,j)%vr%vf(1)%fc(:,1)
       enddo
+      wake_mesh(:,nx+1,j)=wake_array(nx,j)%vr%vf(2)%fc(:,1)
     enddo
     !Check if necessary -$omp end parallel do
     do i=1,nx
       wake_mesh(:,i,ny+1)=wake_array(i,ny)%vr%vf(4)%fc(:,1)
-    enddo
-    do j=1,ny
-      wake_mesh(:,nx+1,j)=wake_array(nx,j)%vr%vf(2)%fc(:,1)
     enddo
     wake_mesh(:,nx+1,ny+1)=wake_array(nx,ny)%vr%vf(3)%fc(:,1)
 
@@ -91,12 +87,10 @@ contains
       do i=1,nx
         wing_mesh(:,i,j)=wing_array(i,j)%pc(:,1)
       enddo
+      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     do i=1,nx
       wing_mesh(:,i,ny+1)=wing_array(i,ny)%pc(:,4)
-    enddo
-    do j=1,ny
-      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     wing_mesh(:,nx+1,ny+1)=wing_array(nx,ny)%pc(:,3)
 
@@ -133,12 +127,10 @@ contains
       do i=1,nx
         wing_mesh(:,i,j)=wing_array(i,j)%vr%vf(1)%fc(:,1)
       enddo
+      wing_mesh(:,nx+1,j)=wing_array(nx,j)%vr%vf(2)%fc(:,1)
     enddo
     do i=1,nx
       wing_mesh(:,i,ny+1)=wing_array(i,ny)%vr%vf(4)%fc(:,1)
-    enddo
-    do j=1,ny
-      wing_mesh(:,nx+1,j)=wing_array(nx,j)%vr%vf(2)%fc(:,1)
     enddo
     wing_mesh(:,nx+1,ny+1)=wing_array(nx,ny)%vr%vf(3)%fc(:,1)
 
@@ -172,12 +164,10 @@ contains
       do i=1,nx
         wing_mesh(:,i,j)=wing_array(i,j)%pc(:,1)
       enddo
+      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     do i=1,nx
       wing_mesh(:,i,ny+1)=wing_array(i,ny)%pc(:,4)
-    enddo
-    do j=1,ny
-      wing_mesh(:,nx+1,j)=wing_array(nx,j)%pc(:,2)
     enddo
     wing_mesh(:,nx+1,ny+1)=wing_array(nx,ny)%pc(:,3)
 
