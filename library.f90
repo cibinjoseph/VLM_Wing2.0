@@ -5,7 +5,7 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 1000
+  integer, parameter :: nt = 500
   integer, parameter :: ns = 13
   integer, parameter :: nc = 1
 
@@ -424,9 +424,12 @@ contains
         call wake_array(i,j)%vr%assignP(3,wake_array(i,j+1)%vr%vf(2)%fc(:,1))
         call wake_array(i,j)%vr%assignP(4,wake_array(i-1,j+1)%vr%vf(2)%fc(:,1))
       enddo
-      call wake_array(1,j)%vr%assignP(3,wake_array(1,j+1)%vr%vf(2)%fc(:,1))
     enddo
     !$omp end parallel do
+
+    do j=1,cols-1
+      call wake_array(1,j)%vr%assignP(3,wake_array(1,j+1)%vr%vf(2)%fc(:,1))
+    enddo
 
     !$omp parallel do
     do i=2,rows
