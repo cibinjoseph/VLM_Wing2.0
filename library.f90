@@ -6,7 +6,7 @@ module library
 
   ! Input parameters
   integer, parameter :: nt = 500
-  integer, parameter :: ns = 25
+  integer, parameter :: ns = 13
   integer, parameter :: nc = 1
 
   ! Global env parameters
@@ -153,6 +153,7 @@ contains
 
         wake_array(i,cols-1)%vr%vf(j)%r_vc0 = tip_core_radius 
         wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
+      enddo
       enddo
 
       ! Root vortex outer region
