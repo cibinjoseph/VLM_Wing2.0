@@ -165,7 +165,6 @@ contains
         wake_array(i,cols-1)%vr%vf(j)%r_vc0 = tip_core_radius 
         wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
       enddo
-    enddo
 
     ! Root vortex outer region
     wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
@@ -174,6 +173,8 @@ contains
     ! Tip  vortex outer region
     wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
     wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
+
+    enddo
 
     if (starting_vortex_core > eps) then
       ! Assign core_radius to starting vortices
