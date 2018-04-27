@@ -5,7 +5,7 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 500
+  integer, parameter :: nt = 5
   integer, parameter :: ns = 13
   integer, parameter :: nc = 1
 
@@ -246,12 +246,12 @@ contains
       do i=1,rows
         call wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
       enddo
-      call wake_array(1,j)%vr%assignP(2,mat(:,1,j))
+      call wake_array(1,j)%vr%assignP(1,mat(:,1,j))
     enddo
     do i=1,rows
-      call wake_array(i,cols)%vr%assignP(2,mat(:,i+1,cols+1))
+      call wake_array(i,cols)%vr%assignP(3,mat(:,i+1,cols+1))
     enddo
-    call wake_array(1,cols)%vr%assignP(2,mat(:,1,cols+1))
+    call wake_array(1,cols)%vr%assignP(4,mat(:,1,cols+1))
   end subroutine mat2wake
 
   !--------------------------------------------------------!
@@ -433,7 +433,6 @@ contains
 
     ! Finite difference part
     do j=1,cols+1
-      r_now(:,1,j)=r_AB(:,1,j)
       do i=2,rows-1
         dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
         r_now(:,i,j)=(r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term))
@@ -441,12 +440,18 @@ contains
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
 
+    do j=1,cols+1
+      r_now(:,1,j)=r_AB(:,1,j)
+    enddo
+
     ! Use AB2 for last 3 rows of coordinates
     do j=1,cols+1
       do i=rows,rows+1
         r_now(:,i,j)=r_AB(:,i,j) 
       enddo
     enddo
+
+    r_now=r_AB
 
     ! Assign back to wake points
     call mat2wake(wake_array_AB,r_now)
