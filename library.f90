@@ -166,13 +166,13 @@ contains
         wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
       enddo
 
-    ! Root vortex outer region
-    wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
-    wake_array(i,3)%vr%vf(1)%r_vc       = tip_core_radius 
+      ! Root vortex outer region
+      wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
+      wake_array(i,3)%vr%vf(1)%r_vc       = tip_core_radius 
 
-    ! Tip  vortex outer region
-    wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
-    wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
+      ! Tip  vortex outer region
+      wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
+      wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
 
     enddo
 
@@ -419,7 +419,7 @@ contains
   subroutine convectwake_CB2D(wake_array_AB,r_now,r_prev,dissip_const)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array using AB2
     real(dp), intent(inout), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_now
-    real(dp), intent(in), dimension(3,size(wake_array_AB,1),size(wake_array_AB,2)) :: r_prev
+    real(dp), intent(in), dimension(3,size(wake_array_AB,1),size(wake_array_AB,2)+1) :: r_prev
     real(dp), intent(in) :: dissip_const
 
     real(dp), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_AB
@@ -434,17 +434,17 @@ contains
 
     ! Finite difference part
     do j=1,cols+1
-      do i=2,rows-1
+      do i=2,rows-2
         dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
-        r_now(:,i,j)=(r_AB(:,i,j)+0.5_dp*dissip_const*(dissip_term))
+        r_now(:,i,j)=(r_AB(:,i,j))!+0.5_dp*dissip_const*(dissip_term))
       enddo
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
 
-    ! Use AB2 for first and last 2 rows of coordinates
+    ! Use AB2 for first and last 3 rows of coordinates
     do j=1,cols+1
       r_now(:,1,j)=r_AB(:,1,j)
-      do i=rows,rows+1
+      do i=rows-1,rows+1
         r_now(:,i,j)=r_AB(:,i,j) 
       enddo
     enddo
