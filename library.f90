@@ -416,13 +416,13 @@ contains
 
 
   subroutine convectwake_CB2D(wake_array_AB,r_now,r_prev,dissip_const)
-    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array after applying Adam Bashforth (Explicit 2nd order)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array using AB2
     real(dp), intent(inout), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_now
     real(dp), intent(in), dimension(3,size(wake_array_AB,1),size(wake_array_AB,2)) :: r_prev
     real(dp), intent(in) :: dissip_const
 
     real(dp), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_AB
-    real(dp), dimension(3) :: dissip_term  ! For  the 3 coordinates
+    real(dp), dimension(3) :: dissip_term  ! For the 3 coordinates
     integer :: i,j,rows,cols
 
     rows=size(wake_array_AB,1)
