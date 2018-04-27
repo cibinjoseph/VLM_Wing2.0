@@ -440,18 +440,13 @@ contains
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
 
+    ! Use AB2 for first and last 2 rows of coordinates
     do j=1,cols+1
       r_now(:,1,j)=r_AB(:,1,j)
-    enddo
-
-    ! Use AB2 for last 3 rows of coordinates
-    do j=1,cols+1
       do i=rows,rows+1
         r_now(:,i,j)=r_AB(:,i,j) 
       enddo
     enddo
-
-    r_now=r_AB
 
     ! Assign back to wake points
     call mat2wake(wake_array_AB,r_now)
