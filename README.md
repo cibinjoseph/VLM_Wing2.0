@@ -1,7 +1,9 @@
 # Documentation
-[![](https://img.shields.io/badge/status-under%20development-green.svg)]()  [![](https://img.shields.io/badge/Last%20Updated-Mar%202018-green.svg)]()  
+[![](https://img.shields.io/badge/status-obsolete-red.svg)]()  [![](https://img.shields.io/badge/Last%20Updated-April%202018-green.svg)]()  
 
 A Parallel, Object oriented implementation of the Unsteady Vortex Lattice method in Fortran 90+ for aerodynamic analysis of a single wing under generic 3D motion.
+
+**Note: This repository is now obsolete and an improved version is being developed under the title [VLM_Rotor1.0](https://github.com/cibinjoseph/VLM_Rotor1.0)**
 
 ## Features
 - Parallelized implementation using OpenMP
