@@ -225,7 +225,7 @@ program main
     if (iter > wake_ignore_nt .or. wake_ignore_nt .eq. 0) then 
       vind_wake(:,row_now:nt,:)=vind_wake(:,row_now:nt,:)+vind_onwake(wake(row_now:nt,:),wake(row_now:nt,:))
     endif
-    if (iter < init_wake_vel_nt .or. init_wake_vel .ne. 0)  vind_wake(3,row_now:nt,:)=vind_wake(3,row_now:nt,:)+init_wake_vel
+    if (iter < init_wake_vel_nt)  vind_wake(3,row_now:nt,:)=vind_wake(3,row_now:nt,:)+init_wake_vel
 
     ! Update wake vortex locations
     select case (FDscheme_switch)
@@ -242,7 +242,7 @@ program main
       if (iter > wake_ignore_nt .or. wake_ignore_nt .eq. 0) then 
         Pvind_wake(:,row_now:nt,:)=Pvind_wake(:,row_now:nt,:)+vind_onwake(Pwake(row_now:nt,:),Pwake(row_now:nt,:))
       endif 
-      if (iter < init_wake_vel_nt .or. init_wake_vel_nt .ne. 0) Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
+      if (iter < init_wake_vel_nt) Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
 
       call convectwake(wake(row_now:nt,:),(vind_wake(:,row_now:nt,:)+Pvind_wake(:,row_now:nt,:))*dt*0.5_dp)
 
@@ -298,7 +298,7 @@ program main
           Pvind_wake(:,row_now:nt,:)=Pvind_wake(:,row_now:nt,:)+vind_onwake(Pwake(row_now:nt,:),Pwake(row_now:nt,:))
         endif 
 
-        if (iter < init_wake_vel_nt .or. init_wake_vel_nt .ne. 0)  &
+        if (iter < init_wake_vel_nt)  &
           Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
 
         vind_wake_step =09._dp/24._dp*Pvind_wake  & 
