@@ -148,12 +148,15 @@ program main
     case (1)    ! Linear slope
       om_body_slow=min(real(slowstart_nt),real(iter+1))*om_body/slowstart_nt
       dpts=om_body_slow*dt     ! dphi dtheta dpsi
+      pqr(3)=-1._dp*om_body_slow(3)
     case (2)    ! tanh slope
       om_body_slow=tanh(5._dp*iter/slowstart_nt)*om_body
       dpts=om_body_slow*dt     ! dphi dtheta dpsi
+      pqr(3)=-1._dp*om_body_slow(3)
     case (3)    ! tanh slope
       om_body_slow=(tanh(6._dp*real(iter)/real(slowstart_nt)-3._dp)+1._dp)*0.5_dp*om_body
       dpts=om_body_slow*dt     ! dphi dtheta dpsi
+      pqr(3)=-1._dp*om_body_slow(3)
     case default
       error stop "Assign correct slowstart_switch"
     end select
@@ -271,7 +274,7 @@ program main
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
-        call convectwake_CB2D(wake(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),0.0_dp)
+        call convectwake_CB2D(wake(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),0.2_dp)
         r_prev(:,row_now:nt+1,:)=r_prev_dummy(:,row_now:nt+1,:)
       endif
 
