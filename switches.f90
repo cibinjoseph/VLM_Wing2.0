@@ -23,4 +23,4 @@ integer, parameter :: FDscheme_switch=3
 integer, parameter :: wake_ignore_nt=0
 
 ! Initial Wake velocity [0]Off [1..]timesteps
-integer, parameter :: init_wake_vel_nt=100
+integer, parameter :: init_wake_vel_nt=0
