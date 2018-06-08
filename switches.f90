@@ -8,7 +8,7 @@ integer, parameter :: tip_diss_switch=0
 
 ! Slow start to avoid large starting vortex: [0]Off [1]linear [2]tanh [3]extended tanh
 integer, parameter :: slowstart_switch=1
-integer, parameter :: slowstart_nt=100
+integer, parameter :: slowstart_nt=200
 
 ! Wake strain: [0]Off [1]On
 integer, parameter :: wakestrain_switch=0
@@ -17,7 +17,7 @@ integer, parameter :: wakestrain_switch=0
 integer, parameter :: wakeplot_switch=2
 
 ! Wake convection finite-difference scheme [0]FT1 [1]PC2 [2]AB2 [3]CB2D [4]AB4
-integer, parameter :: FDscheme_switch=3
+integer, parameter :: FDscheme_switch=2
 
 ! Ignore Wake wake interaction [0]Off [1..]timesteps
 integer, parameter :: wake_ignore_nt=0
