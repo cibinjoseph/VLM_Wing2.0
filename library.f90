@@ -436,7 +436,7 @@ contains
     do j=1,cols+1
       do i=2,rows-2
         dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
-        r_now(:,i,j)=(r_AB(:,i,j))!+0.5_dp*dissip_const*(dissip_term))
+        r_now(:,i,j)=(r_AB(:,i,j))+0.5_dp*dissip_const*(dissip_term)
       enddo
     enddo
     r_now=r_now/(1._dp-0.5_dp*dissip_const)
