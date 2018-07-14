@@ -16,7 +16,7 @@ integer, parameter :: wakestrain_switch=0
 ! Plot wake: [0]Off [1]Last timestep only [2]All timestep wakes
 integer, parameter :: wakeplot_switch=2
 
-! Wake convection finite-difference scheme [0]FT1 [1]PC2 [2]AB2 [3]AB4
+! Wake convection finite-difference scheme [0]FT1 [1]PC2 [2]AB2 [3]CB2D [4]AB4
 integer, parameter :: FDscheme_switch=3
 
 ! Ignore Wake wake interaction [0]Off [1..]timesteps

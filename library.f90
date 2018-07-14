@@ -150,27 +150,30 @@ contains
 
     ! Assign core_radius to tip vortices
     do i=1,rows
-      ! Root vortex 
-      wake_array(i,1)%vr%vf(1)%r_vc0      = tip_core_radius 
-      wake_array(i,1)%vr%vf(1)%r_vc       = tip_core_radius 
-      wake_array(i,1)%vr%vf(3)%r_vc0      = tip_core_radius 
-      wake_array(i,1)%vr%vf(3)%r_vc       = tip_core_radius 
+      do j=1,3,2
+        ! Root vortex 
+        wake_array(i,1)%vr%vf(j)%r_vc0      = tip_core_radius 
+        wake_array(i,1)%vr%vf(j)%r_vc       = tip_core_radius 
 
-      wake_array(i,2)%vr%vf(1)%r_vc0      = tip_core_radius 
-      wake_array(i,2)%vr%vf(1)%r_vc       = tip_core_radius 
-      wake_array(i,2)%vr%vf(3)%r_vc0      = tip_core_radius 
-      wake_array(i,2)%vr%vf(3)%r_vc       = tip_core_radius 
+        wake_array(i,2)%vr%vf(j)%r_vc0      = tip_core_radius 
+        wake_array(i,2)%vr%vf(j)%r_vc       = tip_core_radius 
 
-      ! Tip vortex 
-      wake_array(i,cols)%vr%vf(1)%r_vc0   = tip_core_radius 
-      wake_array(i,cols)%vr%vf(1)%r_vc    = tip_core_radius 
-      wake_array(i,cols)%vr%vf(3)%r_vc0   = tip_core_radius 
-      wake_array(i,cols)%vr%vf(3)%r_vc    = tip_core_radius 
+        ! Tip vortex 
+        wake_array(i,cols)%vr%vf(j)%r_vc0   = tip_core_radius 
+        wake_array(i,cols)%vr%vf(j)%r_vc    = tip_core_radius 
 
-      wake_array(i,cols-1)%vr%vf(3)%r_vc0 = tip_core_radius 
-      wake_array(i,cols-1)%vr%vf(3)%r_vc  = tip_core_radius 
-      wake_array(i,cols-1)%vr%vf(3)%r_vc0 = tip_core_radius 
-      wake_array(i,cols-1)%vr%vf(3)%r_vc  = tip_core_radius 
+        wake_array(i,cols-1)%vr%vf(j)%r_vc0 = tip_core_radius 
+        wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
+      enddo
+
+      ! Root vortex outer region
+      wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
+      wake_array(i,3)%vr%vf(1)%r_vc       = tip_core_radius 
+
+      ! Tip  vortex outer region
+      wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
+      wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
+
     enddo
 
     if (starting_vortex_core > eps) then
@@ -183,8 +186,9 @@ contains
           wake_array(rows-1,i)%vr%vf(j)%r_vc  = starting_vortex_core
         enddo
       enddo
+      wake_array(rows-2,i)%vr%vf(2)%r_vc0 = starting_vortex_core
+      wake_array(rows-2,i)%vr%vf(2)%r_vc  = starting_vortex_core
     endif
-
   end subroutine init_wake
 
   ! Checks whether CP lies inside viscous core region of vortex ring
@@ -207,6 +211,49 @@ contains
       isCPinsidecore = .true.  ! Bottom edge
     endif
   end function isCPinsidecore
+
+  ! Converts coordinates of panel array(m x n) to a matrix(m+1 x n+1)
+  subroutine wake2mat(wake_array,mat)
+    type(wakepanel_class), intent(in), dimension(:,:) :: wake_array
+    real(dp), intent(out), dimension(3,size(wake_array,1)+1,size(wake_array,2)+1) :: mat
+    integer :: i, j, rows, cols
+
+    rows = size(wake_array,1)
+    cols = size(wake_array,2)
+
+    do j=1,cols
+      do i=1,rows
+        mat(:,i+1,j)=wake_array(i,j)%vr%vf(2)%fc(:,1)
+      enddo
+      mat(:,1,j)=wake_array(1,j)%vr%vf(1)%fc(:,1)
+    enddo
+    do i=1,rows
+      mat(:,i+1,cols+1)=wake_array(i,cols)%vr%vf(3)%fc(:,1)
+    enddo
+    mat(:,1,cols+1)=wake_array(1,cols)%vr%vf(4)%fc(:,1)
+  end subroutine wake2mat
+
+  ! Converts values from a matrix(m+1 x n+1) to coordinates of panel array(m x n)
+  subroutine mat2wake(wake_array,mat)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
+    real(dp), intent(in), dimension(3,size(wake_array,1)+1,size(wake_array,2)+1) :: mat
+    integer :: i, j, rows, cols
+
+    rows = size(wake_array,1)
+    cols = size(wake_array,2)
+
+    do j=1,cols
+      do i=1,rows
+        call wake_array(i,j)%vr%assignP(2,mat(:,i+1,j))
+      enddo
+      call wake_array(1,j)%vr%assignP(1,mat(:,1,j))
+    enddo
+    do i=1,rows
+      call wake_array(i,cols)%vr%assignP(3,mat(:,i+1,cols+1))
+    enddo
+    call wake_array(1,cols)%vr%assignP(4,mat(:,1,cols+1))
+  end subroutine mat2wake
+
   !--------------------------------------------------------!
   !                 Wing Motion Functions                  !
   !--------------------------------------------------------!
@@ -367,6 +414,47 @@ contains
     call wake_continuity(wake_array)
   end subroutine convectwake
 
+
+  subroutine convectwake_CB2D(wake_array_AB,r_now,r_prev,dissip_const)
+    type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array_AB  ! wake array using AB2
+    real(dp), intent(inout), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_now
+    real(dp), intent(in), dimension(3,size(wake_array_AB,1),size(wake_array_AB,2)+1) :: r_prev
+    real(dp), intent(in) :: dissip_const
+
+    real(dp), dimension(3,size(wake_array_AB,1)+1,size(wake_array_AB,2)+1) :: r_AB
+    real(dp), dimension(3) :: dissip_term  ! For the 3 coordinates
+    integer :: i,j,rows,cols
+
+    rows=size(wake_array_AB,1)
+    cols=size(wake_array_AB,2)
+
+    ! Assign coordinates to r matrices
+    call wake2mat(wake_array_AB,r_AB)
+
+    ! Finite difference part
+    do j=1,cols+1
+      do i=2,rows-2
+        dissip_term=r_now(:,i-1,j)-2._dp*r_now(:,i+1,j)-2._dp*r_now(:,i,j)+r_prev(:,i+2,j)+r_prev(:,i+1,j)
+        r_now(:,i,j)=(r_AB(:,i,j))+0.5_dp*dissip_const*(dissip_term)
+      enddo
+    enddo
+    r_now=r_now/(1._dp-0.5_dp*dissip_const)
+
+    ! Use AB2 for first and last 3 rows of coordinates
+    do j=1,cols+1
+      r_now(:,1,j)=r_AB(:,1,j)
+      do i=rows-1,rows+1
+        r_now(:,i,j)=r_AB(:,i,j) 
+      enddo
+    enddo
+
+    ! Assign back to wake points
+    call mat2wake(wake_array_AB,r_now)
+
+    call wake_continuity(wake_array_AB)
+  end subroutine convectwake_CB2D
+
+
   ! Maintain continuity between vortex ring elements after convection
   ! of vortex ring corners
   subroutine wake_continuity(wake_array)
@@ -386,11 +474,9 @@ contains
     enddo
     !$omp end parallel do
 
-    !$omp parallel do
     do j=1,cols-1
       call wake_array(1,j)%vr%assignP(3,wake_array(1,j+1)%vr%vf(2)%fc(:,1))
     enddo
-    !$omp end parallel do
 
     !$omp parallel do
     do i=2,rows
