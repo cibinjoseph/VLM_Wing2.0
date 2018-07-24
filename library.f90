@@ -442,7 +442,7 @@ contains
 
     ! Use AB2 for first and last 3 rows of coordinates
     do j=1,cols+1
-      r_now(:,1,j)=r_AB(:,1,j)
+      !r_now(:,1,j)=r_AB(:,1,j)
       do i=rows-1,rows+1
         r_now(:,i,j)=r_AB(:,i,j) 
       enddo
