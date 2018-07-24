@@ -247,7 +247,9 @@ program main
       endif 
       if (iter < init_wake_vel_nt) Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
 
-      call convectwake(wake(row_now:nt,:),(vind_wake(:,row_now:nt,:)+Pvind_wake(:,row_now:nt,:))*dt*0.5_dp)
+      call convectwake(wake(row_now:nt,:),vel_order2(vind_wake(:,row_now:nt,:),Pvind_wake(:,row_now:nt,:))*dt)
+      !call convectwake(wake(row_now:nt,:),(vind_wake(:,row_now:nt,:)+Pvind_wake(:,row_now:nt,:))*dt*0.5_dp)
+      
 
     case (2)    ! Adam-Bashforth (2nd order)
       if (iter == 1) then
