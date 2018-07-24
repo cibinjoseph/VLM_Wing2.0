@@ -248,8 +248,7 @@ program main
       if (iter < init_wake_vel_nt) Pvind_wake(3,row_now:nt,:)=Pvind_wake(3,row_now:nt,:)+init_wake_vel
 
       call convectwake(wake(row_now:nt,:),vel_order2(vind_wake(:,row_now:nt,:),Pvind_wake(:,row_now:nt,:))*dt)
-      !call convectwake(wake(row_now:nt,:),(vind_wake(:,row_now:nt,:)+Pvind_wake(:,row_now:nt,:))*dt*0.5_dp)
-      
+
 
     case (2)    ! Adam-Bashforth (2nd order)
       if (iter == 1) then
@@ -260,6 +259,7 @@ program main
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
         vind_wake1=vind_wake
       endif
+
 
     case (3)    ! CB2D (2nd order with dissipation)
       if (iter == 1) then
@@ -279,6 +279,7 @@ program main
         call convectwake_CB2D(wake(row_now:nt,:),r_now(:,row_now:nt+1,:),r_prev(:,row_now+1:nt+1,:),0.0065_dp)
         r_prev(:,row_now:nt+1,:)=r_prev_dummy(:,row_now:nt+1,:)
       endif
+
 
     case (4)    ! Predictor-Corrector Adam-Bashforth (4th order)
       if (iter == 1) then
