@@ -665,6 +665,20 @@ contains
     !$omp end parallel do
   end function vind_onwake_bywake
 
+  ! Calculates 2nd order accurate induced velocity on wake
+  function vel_order2(v_wake_n,v_wake_np1)
+    real(dp), intent(in), dimension(:,:,:) :: v_wake_n, v_wake_np1
+    real(dp), dimension(3,size(v_wake_n,2),size(v_wake_n,3)) :: vel_order2
+    integer :: i,j
+    do j=1,size(v_wake_n,3)
+      vel_order2(:,1,j)=(v_wake_np1(:,1,j)+v_wake_n(:,1,j))*2._dp
+      do i=2,size(v_wake_n,2)-1
+        vel_order2(:,i,j)=v_wake_np1(:,i,j)+v_wake_np1(:,i-1,j)+v_wake_n(:,i+1,j)+v_wake_n(:,i,j)
+      enddo
+      vel_order2(:,size(v_wake_n,2),j)=(v_wake_np1(:,size(v_wake_n,2),j)+v_wake_n(:,size(v_wake_n,2)    ,j))*2._dp
+    enddo
+  end function vel_order2
+
   !--------------------------------------------------------!
   !               Force Computation Functions              !
   !--------------------------------------------------------!
