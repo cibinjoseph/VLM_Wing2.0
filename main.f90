@@ -167,12 +167,12 @@ program main
     theta_pitch=theta0+thetas*sin(om_theta*t)
     dtheta_pitch=dtheta_pitch-theta_pitch
 
-    if (tip_diss_switch .eq. 1) then
+    if (wakediss_switch .eq. 1) then
       ! Age vortex filaments
       call age_wake(wake(row_now:nt,:),dt)
 
       ! Wake tip dissipation
-      call dissipate_tip(wake(row_now:nt,:))
+      call dissipate_wake(wake(row_now:nt,:))
     endif
 
     ! Wing velocities

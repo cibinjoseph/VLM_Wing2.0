@@ -497,27 +497,24 @@ contains
     !$omp end parallel do
   end subroutine age_wake
 
-  subroutine dissipate_tip(wake_array)
+  subroutine dissipate_wake(wake_array)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
     real(dp) :: oseen_param, turb_visc, kin_visc, new_radius
-    integer :: ii,tip
+    integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
     turb_visc  = 500._dp
-    tip=size(wake_array,2)
 
-    do ii=1,size(wake_array,1)
-      ! Root vortex core
-      new_radius=sqrt(wake_array(ii,1)%vr%vf(1)%r_vc**2._dp &
-        +4._dp*oseen_param*turb_visc*kin_visc*wake_array(ii,1)%vr%vf(1)%age)
-      wake_array(ii,1)%vr%vf(1)%r_vc=new_radius
-
-      ! Tip vortex core
-      new_radius=sqrt(wake_array(ii,tip)%vr%vf(3)%r_vc**2._dp &
-        +4._dp*oseen_param*turb_visc*kin_visc*wake_array(ii,tip)%vr%vf(3)%age)
-      wake_array(ii,tip)%vr%vf(3)%r_vc=new_radius
+    do jj=1,size(wake_array,2)
+      do ii=1,size(wake_array,1)
+        do ifil=1,4
+          new_radius=sqrt(wake_array(ii,jj)%vr%vf(ifil)%r_vc**2._dp &
+            +4._dp*oseen_param*turb_visc*kin_visc*wake_array(ii,jj)%vr%vf(ifil)%age)
+          wake_array(ii,jj)%vr%vf(ifil)%r_vc=new_radius
+        enddo
+      enddo
     enddo
-  end subroutine dissipate_tip
+  end subroutine dissipate_wake
 
   subroutine strain_wake(wake_array)
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
