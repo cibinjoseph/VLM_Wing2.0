@@ -5,9 +5,9 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 1000
-  integer, parameter :: ns = 13
-  integer, parameter :: nc = 4
+  integer, parameter :: nt = 500
+  integer, parameter :: ns = 3
+  integer, parameter :: nc = 1
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
@@ -503,7 +503,7 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 100._dp
+    turb_visc  = 200._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
@@ -542,7 +542,7 @@ contains
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
     real(dp), intent(in), dimension(3) :: uvw, pqr
     integer :: i,j
-
+   
     do j=1,size(wing_array,2)
       do i=1,size(wing_array,1)
         wing_array(i,j)%velCPm=uvw+cross3(pqr,wing_array(i,j)%cp)
@@ -753,7 +753,11 @@ contains
         +          dot_product(wg(i,1)%velCP,tau_s)*(wg(i,1)%vr%gam)/dot_product(tau_s,tau_s) &
         +          (wg(i,1)%vr%gam-gam_prev(i,1))/dt
     enddo
+    print*,dot_product(wg(1,1)%velCP,tau_c)  ! DEBUG
+    stop
     wg%delP=density*wg%delP
+    print*, wg%delP  ! DEBUG
+    read*
 
     do j=1,cols
       do i=1,rows
