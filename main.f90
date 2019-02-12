@@ -67,10 +67,6 @@ program main
   call init_wing(wing,xvec,yvec,wing_mid_core,wing_tip_core)
   hub_coords=0._dp
 
-  ! Rotate wing pc, vr, cp and ncap by initial pitch angle 
-  theta_pitch=theta0
-  call rot_wing(wing,(/0._dp,theta_pitch,0._dp/),hub_coords,1)
-
   !  TE vortex position
   v_shed=0.2_dp*vwind
   if (abs(norm2(vwind)) < eps) v_shed(1)=0.02_dp*chord/(dt*nc)
@@ -78,6 +74,10 @@ program main
     call wing(nc,ispan)%vr%shiftdP(2,v_shed*dt)
     call wing(nc,ispan)%vr%shiftdP(3,v_shed*dt)
   enddo
+
+  ! Rotate wing pc, vr, cp and ncap by initial pitch angle 
+  theta_pitch=theta0
+  call rot_wing(wing,(/0._dp,theta_pitch,0._dp/),hub_coords,1)
 
   ! Influence Coefficient Matrix 
   row=1
