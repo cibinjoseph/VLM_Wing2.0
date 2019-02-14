@@ -751,7 +751,7 @@ contains
       tau_s=wg(i,1)%pc(:,4)-wg(i,1)%pc(:,1)
       wg(i,1)%delP=dot_product(wg(i,1)%velCP,tau_c)*(wg(i,1)%vr%gam-wg(i-1,1)%vr%gam)/dot_product(tau_c,tau_c) &
         +          dot_product(wg(i,1)%velCP,tau_s)*(wg(i,1)%vr%gam)/dot_product(tau_s,tau_s) &
-      +          (wg(i,1)%vr%gam-gam_prev(i,1))/dt
+        +          (wg(i,1)%vr%gam-gam_prev(i,1))/dt
     enddo
     wg%delP=density*wg%delP
 
