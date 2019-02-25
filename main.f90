@@ -195,14 +195,7 @@ program main
     call gam2file(yvec,gam_sectional,'Results/gam'//timestamp//'.curve')
 
     ! Induced vel at coll. point (excluding pitch and wing induced velocities)
-    ! DEBUG
-    print*, wake(nt,1)%vr%vf(1)%r_vc
-    print*, wake(nt,1)%vr%vf(1)%age
-    stop
     call vind_CP(wing,vwind-vel_plunge,pqr,wake(row_now:nt,:))
-    ! DEBUG
-    print*,wing(1,1)%velCP
-    stop
     RHS=0._dp
     indx=1
     do ispan=1,ns
@@ -221,10 +214,6 @@ program main
 
     gamvec_prev=gamvec    ! For calculating dGam/dT
     gamvec=matmul(Amat_inv,RHS)
-    ! DEBUG
-    print*,RHS(1)
-    !print*,gamvec
-    read*
 
     ! Map gamvec to wing gam
     wing%vr%gam=reshape(gamvec,(/nc,ns/))    ! ns,nc due to transpose
