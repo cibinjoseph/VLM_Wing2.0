@@ -4,7 +4,7 @@
 integer, parameter :: span_spacing_switch=1
 
 ! Wake tip dissipation: [0]Off [1]On
-integer, parameter :: wakediss_switch=0
+integer, parameter :: wakediss_switch=1
 
 ! Slow start to avoid large starting vortex: [0]Off [1]linear [2]tanh [3]extended tanh
 integer, parameter :: slowstart_switch=0

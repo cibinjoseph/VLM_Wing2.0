@@ -5,8 +5,8 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 200
-  integer, parameter :: ns = 4
+  integer, parameter :: nt = 100
+  integer, parameter :: ns = 13
   integer, parameter :: nc = 1
 
   ! Global env parameters
@@ -503,7 +503,7 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 200._dp
+    turb_visc  = 500._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
