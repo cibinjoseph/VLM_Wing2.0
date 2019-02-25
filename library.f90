@@ -503,7 +503,7 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 500._dp
+    turb_visc  = 400._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
