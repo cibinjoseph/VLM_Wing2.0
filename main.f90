@@ -167,14 +167,6 @@ program main
     theta_pitch=theta0+thetas*sin(om_theta*t)
     dtheta_pitch=dtheta_pitch-theta_pitch
 
-    if (wakediss_switch .eq. 1) then
-      ! Age vortex filaments
-      call age_wake(wake(row_now:nt,:),dt)
-
-      ! Wake tip dissipation
-      call dissipate_wake(wake(row_now:nt,:))
-    endif
-
     ! Wing velocities
     thetadot=thetas*om_theta*cos(om_theta*t)
     hdot=om_h*h0*cos(om_h*t)
@@ -188,6 +180,14 @@ program main
 
     call assignshed(wake(row_now,:),wing(nc,:),'LE')  ! Store shed vortex as LE
 
+    if (wakediss_switch .eq. 1) then
+      ! Age vortex filaments
+      call age_wake(wake(row_now:nt,:),dt)
+
+      ! Wake tip dissipation
+      call dissipate_wake(wake(row_now:nt,:))
+    endif
+
     ! Write out wing n' wake
     if (wakeplot_switch .eq. 2) call mesh2file(wing,wake(row_now:nt,:),'Results/wNw'//timestamp//'.tec')
     call tip2file(wing,wake(row_now:nt,:),'Results/tip'//timestamp//'.tec')
@@ -195,7 +195,14 @@ program main
     call gam2file(yvec,gam_sectional,'Results/gam'//timestamp//'.curve')
 
     ! Induced vel at coll. point (excluding pitch and wing induced velocities)
+    ! DEBUG
+    print*, wake(nt,1)%vr%vf(1)%r_vc
+    print*, wake(nt,1)%vr%vf(1)%age
+    stop
     call vind_CP(wing,vwind-vel_plunge,pqr,wake(row_now:nt,:))
+    ! DEBUG
+    print*,wing(1,1)%velCP
+    stop
     RHS=0._dp
     indx=1
     do ispan=1,ns
@@ -214,6 +221,10 @@ program main
 
     gamvec_prev=gamvec    ! For calculating dGam/dT
     gamvec=matmul(Amat_inv,RHS)
+    ! DEBUG
+    print*,RHS(1)
+    !print*,gamvec
+    read*
 
     ! Map gamvec to wing gam
     wing%vr%gam=reshape(gamvec,(/nc,ns/))    ! ns,nc due to transpose
