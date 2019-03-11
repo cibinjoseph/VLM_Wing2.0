@@ -5,7 +5,7 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 100
+  integer, parameter :: nt = 600
   integer, parameter :: ns = 13
   integer, parameter :: nc = 1
 
@@ -503,12 +503,12 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 400._dp
+    turb_visc  = 1000._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
         do ifil=1,4
-          new_radius=sqrt(wake_array(ii,jj)%vr%vf(ifil)%r_vc**2._dp &
+          new_radius=sqrt(wake_array(ii,jj)%vr%vf(ifil)%r_vc0**2._dp &
             +4._dp*oseen_param*turb_visc*kin_visc*wake_array(ii,jj)%vr%vf(ifil)%age)
           wake_array(ii,jj)%vr%vf(ifil)%r_vc=new_radius
         enddo
