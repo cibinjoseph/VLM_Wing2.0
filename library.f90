@@ -5,9 +5,9 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 1440
-  integer, parameter :: ns = 13
-  integer, parameter :: nc = 1
+  integer, parameter :: nt = 120
+  integer, parameter :: ns = 20
+  integer, parameter :: nc = 6
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
@@ -503,7 +503,7 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 500._dp
+    turb_visc  = 1000._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
@@ -512,9 +512,9 @@ contains
             +4._dp*oseen_param*turb_visc*kin_visc*wake_array(ii,jj)%vr%vf(ifil)%age)
           wake_array(ii,jj)%vr%vf(ifil)%r_vc=new_radius
         enddo
-        if (wake_array(ii,jj)%vr%vf(1)%age > 0.1994_dp*8._dp) then
-          wake_array(ii,jj)%vr%gam=0.0_dp
-        endif
+        !if (wake_array(ii,jj)%vr%vf(1)%age > 0.1994_dp*8._dp) then
+        !  wake_array(ii,jj)%vr%gam=0.0_dp
+        !endif
       enddo
     enddo
   end subroutine dissipate_wake
