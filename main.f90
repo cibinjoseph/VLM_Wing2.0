@@ -62,6 +62,8 @@ program main
   ! Initialize wake geometry and core radius
   call init_wake(wake,wake_mid_core,wake_tip_core,starting_vortex_core)
   gamvec_prev=0._dp
+  ! DEBUG
+  !vind_wake=0._dp
 
   ! Initialize wing geometry, vr, cp, ncap coordinates and core radius
   call init_wing(wing,xvec,yvec,wing_mid_core,wing_tip_core)
