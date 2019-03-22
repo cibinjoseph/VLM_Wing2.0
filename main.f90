@@ -62,8 +62,12 @@ program main
   ! Initialize wake geometry and core radius
   call init_wake(wake,wake_mid_core,wake_tip_core,starting_vortex_core)
   gamvec_prev=0._dp
-  ! DEBUG
-  !vind_wake=0._dp
+  vind_wake=0._dp
+  vind_wake1=0._dp
+  vind_wake2=0._dp
+  vind_wake3=0._dp
+  vind_wake_step=0._dp
+  Pvind_wake=0._dp
 
   ! Initialize wing geometry, vr, cp, ncap coordinates and core radius
   call init_wing(wing,xvec,yvec,wing_mid_core,wing_tip_core)
@@ -228,7 +232,7 @@ program main
     ! Induced vel on wake vortices
     vind_wake(:,row_now:nt,:)=vind_onwake(wing,wake(row_now:nt,:))
     if (iter > wake_ignore_nt .or. wake_ignore_nt .eq. 0) then 
-      vind_wake(:,row_now:nt,:)=vind_wake(:,row_now:nt,:)+vind_onwake(wake(row_now:nt,:),wake(row_now:nt,:))
+      !vind_wake(:,row_now:nt,:)=vind_wake(:,row_now:nt,:)+vind_onwake(wake(row_now:nt,:),wake(row_now:nt,:))
     endif
     if (iter < init_wake_vel_nt)  vind_wake(3,row_now:nt,:)=vind_wake(3,row_now:nt,:)+init_wake_vel
 
