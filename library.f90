@@ -6,8 +6,8 @@ module library
 
   ! Input parameters
   integer, parameter :: nt = 60
-  integer, parameter :: ns = 4
-  integer, parameter :: nc = 1
+  integer, parameter :: ns = 20
+  integer, parameter :: nc = 6
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
@@ -625,7 +625,7 @@ contains
     rows=size(wake_array,1)
     cols=size(wake_array,2)
 
-    !$omp parallel do collapse(2) shared(wake_array,wing_array,vind_array)
+    !$omp parallel do collapse(2) 
     do j=1,cols
       do i=1,rows
         vind_array(:,i,j)=vind_panelgeo(wing_array,wake_array(i,j)%vr%vf(2)%fc(:,1))
@@ -633,7 +633,7 @@ contains
     enddo
     !$omp end parallel do
 
-    !$omp parallel do shared(wake_array,wing_array,vind_array)
+    !$omp parallel do 
     do i=1,rows
       vind_array(:,i,cols+1)=vind_panelgeo(wing_array,wake_array(i,cols)%vr%vf(3)%fc(:,1))
     enddo
