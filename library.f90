@@ -540,15 +540,15 @@ contains
   ! Calculates local velocity at CP velCP and velCPm on wing
   ! Includes uvw, pqr, wake induced velocity
   ! Excludes pitch velocity, wing self-induced velocity
-  subroutine vind_CP(wing_array,uvw,pqr,wake_array)
+  subroutine vind_CP(wing_array,uvw,pqr,hub_coords,wake_array)
     type(wingpanel_class), intent(inout), dimension(:,:) :: wing_array
     type(wakepanel_class), intent(inout), dimension(:,:) :: wake_array
-    real(dp), intent(in), dimension(3) :: uvw, pqr
+    real(dp), intent(in), dimension(3) :: uvw, pqr, hub_coords
     integer :: i,j
    
     do j=1,size(wing_array,2)
       do i=1,size(wing_array,1)
-        wing_array(i,j)%velCPm=uvw+cross3(pqr,wing_array(i,j)%cp)
+        wing_array(i,j)%velCPm=0._dp*uvw+cross3(pqr,wing_array(i,j)%cp-hub_coords)
         wing_array(i,j)%velCP=wing_array(i,j)%velCPm+vind_panelgeo(wake_array,wing_array(i,j)%cp)
       enddo
     enddo

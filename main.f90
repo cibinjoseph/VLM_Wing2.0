@@ -201,7 +201,7 @@ program main
     call gam2file(yvec,gam_sectional,'Results/gam'//timestamp//'.curve')
 
     ! Induced vel at coll. point (excluding pitch and wing induced velocities)
-    call vind_CP(wing,vwind-vel_plunge,pqr,wake(row_now:nt,:))
+    call vind_CP(wing,vwind-vel_plunge,pqr,hub_coords,wake(row_now:nt,:))
     RHS=0._dp
     indx=1
     do ispan=1,ns
@@ -232,8 +232,7 @@ program main
     ! Induced vel on wake vortices
     vind_wake(:,row_now:nt,:)=vind_onwake(wing,wake(row_now:nt,:))
     if (iter > wake_ignore_nt .or. wake_ignore_nt .eq. 0) then 
-      ! DEBUG
-      !vind_wake(:,row_now:nt,:)=vind_wake(:,row_now:nt,:)+vind_onwake(wake(row_now:nt,:),wake(row_now:nt,:))
+      vind_wake(:,row_now:nt,:)=vind_wake(:,row_now:nt,:)+vind_onwake(wake(row_now:nt,:),wake(row_now:nt,:))
     endif
     if (iter < init_wake_vel_nt)  vind_wake(3,row_now:nt,:)=vind_wake(3,row_now:nt,:)+init_wake_vel
 
