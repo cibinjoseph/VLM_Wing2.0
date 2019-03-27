@@ -5,6 +5,14 @@ module mymathlib
   real(dp), parameter :: pi = atan(1._dp)*4._dp
   real(dp), parameter :: eps = epsilon(1._dp)
 
+  real(dp), parameter, dimension(3) :: xAxis = (/1._dp,0._dp,0._dp/)
+  real(dp), parameter, dimension(3) :: yAxis = (/0._dp,1._dp,0._dp/)
+  real(dp), parameter, dimension(3) :: zAxis = (/0._dp,0._dp,1._dp/)
+
+  interface lsq2
+    module procedure lsq2_scalar, lsq2_array
+  end interface
+
 contains
 
   ! -------------------------------------------------
@@ -128,10 +136,15 @@ contains
     ! Variables for LU Decomposition
     real(dp), dimension(size(A,1),size(A,1)) :: L,U,P
     real(dp), dimension(size(A,1)) :: Pb,d,x,bvec
-    real(dp) :: sumu, suml, det
+    real(dp) :: sumu, suml
+    real(dp), dimension(size(A,1)) :: diagonalTerms
 
     n=size(A,1)
     A_dummy=A
+
+    ! Initialise LU matrices
+    U=0._dp
+    L=0._dp
 
     ! Find Permutation Matrix for partial pivoting
     ! Creating P as Identity Matrix
@@ -178,9 +191,8 @@ contains
     enddo
 
     ! Assigning all zero elements in triangular matrices
-    det=1._dp
     do i=1,n
-      det=det*U(i,i)
+      diagonalTerms(i)=U(i,i)
       do j=1,n
         if (i>j) then
           U(i,j)=0._dp
@@ -190,16 +202,20 @@ contains
       enddo
     enddo
 
-    ! Checking Determinant for singularity
-    if (abs(det)<eps) then
-      print*
-      print*,'ERROR: Matrix is Singular or Ill-conditioned!!'
-      call print_mat(A)
-      print*,'Determinant was found to be:'
-      print*,det
-      call print_mat(U)
-      stop 404
-    endif
+    ! Checking diagonal elements for zero
+    ! If determinant is computed here by multiplication,
+    ! for large matrices it may produce floating point overflow
+    do i=1,n
+      if (abs(diagonalTerms(i))<eps) then
+        print*
+        print*,'ERROR: Matrix is Singular or Ill-conditioned!!'
+        print*,'A-matrix:'
+        call print_mat(A)
+        print*,'U-matrix:'
+        call print_mat(U)
+        stop 404
+      endif
+    enddo
 
     ! Changing RHS loop
     do bb=1,n
@@ -235,6 +251,34 @@ contains
 
   end function inv
 
+  function isInverse(A,Ainv)
+    logical :: isInverse
+    real(dp), intent(in), dimension(:,:) :: A, Ainv
+    real(dp), dimension(size(A,1),size(A,2)) :: productMat
+    integer :: i,j
+    real(dp) :: tol
+
+    productMat=matmul(A,Ainv)
+    isInverse=.TRUE.
+    tol=eps*1000._dp
+
+    do j=1,size(A,2)
+      do i=1,size(A,1)
+        if (i .ne. j) then
+          ! Check if off-diagonal values are 0._dp
+          if (productMat(i,j) > tol) then
+            isInverse=.FALSE.
+          endif
+        else
+          ! Check if on-diagonal values are 1._dp
+          if (productMat(i,j)-1._dp > tol) then
+            isInverse=.FALSE.
+          endif
+        endif
+      enddo
+    enddo
+  end function isInverse
+
   ! -------------------------------------------------
   !                print_mat
   ! -------------------------------------------------
@@ -268,6 +312,120 @@ contains
     norm=sqrt(norm)
   end function norm
 
+  !--------------------------------------------------------!
+  !        Linear Least Squares fitting (2nd order)        !
+  !--------------------------------------------------------!
+  function lsq2_scalar(xQuery,xData,yData)
+    real(dp), intent(in) :: xQuery
+    real(dp), intent(in), dimension(:) :: xData, yData
+    real(dp), dimension(3) :: coeff, RHS
+    real(dp), dimension(3,3) :: Amat
+    real(dp) :: lsq2_scalar
+
+    if (size(xData) .ne. size(yData)) error stop 'ERROR: size of xData and yData have to be equal'
+
+    Amat(1,1)=size(xData)
+    Amat(1,2)=sum(xData)
+    Amat(1,3)=sum(xData**2._dp)
+    Amat(2,1)=Amat(1,2)
+    Amat(2,2)=Amat(1,3)
+    Amat(2,3)=sum(xData**3._dp)
+    Amat(3,1)=Amat(1,3)
+    Amat(3,2)=Amat(2,3)
+    Amat(3,3)=sum(xData**4._dp)
+
+    RHS(1)=sum(yData)
+    RHS(2)=sum(yData*xData)
+    RHS(3)=sum(yData*xData**2._dp)
+
+    coeff=matmul(inv(Amat),RHS)
+
+    lsq2_scalar=coeff(1)+coeff(2)*xQuery+coeff(3)*xQuery*xQuery
+  end function lsq2_scalar
+
+  function lsq2_array(xQuery,xData,yData)
+    real(dp), intent(in), dimension(:) :: xQuery
+    real(dp), intent(in), dimension(:) :: xData, yData
+    real(dp), dimension(3) :: coeff, RHS
+    real(dp), dimension(3,3) :: Amat
+    real(dp), dimension(size(xQuery)) :: lsq2_array
+    integer :: i
+
+    if (size(xData) .ne. size(yData)) error stop 'ERROR: size of xData and yData have to be equal'
+
+    Amat(1,1)=size(xData)
+    Amat(1,2)=sum(xData)
+    Amat(1,3)=sum(xData**2._dp)
+    Amat(2,1)=Amat(1,2)
+    Amat(2,2)=Amat(1,3)
+    Amat(2,3)=sum(xData**3._dp)
+    Amat(3,1)=Amat(1,3)
+    Amat(3,2)=Amat(2,3)
+    Amat(3,3)=sum(xData**4._dp)
+
+    RHS(1)=sum(yData)
+    RHS(2)=sum(yData*xData)
+    RHS(3)=sum(yData*xData**2._dp)
+
+    coeff=matmul(inv(Amat),RHS)
+
+    do i=1,size(xQuery)
+      lsq2_array(i)=coeff(1)+coeff(2)*xQuery(i)+coeff(3)*xQuery(i)*xQuery(i)
+    enddo
+  end function lsq2_array
+
+  !--------------------------------------------------------!
+  !              Transformation Functions                  !
+  !--------------------------------------------------------!
+  ! Code to generate Transformation matrices in Octave
+  !
+  ! clc; clear;
+  ! pkg load symbolic;
+  ! syms p t s
+  ! Rp=[[1,0,0];[0,cos(p),sin(p)];[0,-sin(p),cos(p)]];
+  ! Rt=[[cos(t),0,-sin(t)];[0,1,0];[sin(t),0,cos(t)]];
+  ! Rs=[[cos(s),sin(s),0];[-sin(s),cos(s),0];[0,0,1]];
+  ! Tbg=Rp*Rt*Rs
+  ! Tgb=Rs'*Rt'*Rp'
+
+  !! Transformation matrix bg
+  !function Tbg(cs_phi,cs_theta,cs_psi)
+  !  real(dp), dimension(2), intent(in) :: cs_phi, cs_theta, cs_psi  ! cos and sin
+  !  real(dp), dimension(3,3) :: Tbg
+  !  Tbg(1,:)=(/cs_psi(1)*cs_theta(1),cs_theta(1)*cs_psi(2),-1._dp*cs_theta(2)/)
+  !  Tbg(2,1)=cs_psi(1)*cs_phi(2)*cs_theta(2)-cs_phi(1)*cs_psi(2)
+  !  Tbg(2,2)=cs_phi(1)*cs_psi(1)+cs_phi(2)*cs_psi(2)*cs_theta(2)
+  !  Tbg(2,3)=cs_theta(1)*cs_phi(2)
+  !  Tbg(3,1)=cs_phi(1)*cs_psi(1)*cs_theta(2)+cs_phi(2)*cs_psi(2)
+  !  Tbg(3,2)=cs_phi(1)*cs_psi(2)*cs_theta(2)-cs_psi(1)*cs_phi(2)
+  !  Tbg(3,3)=cs_phi(1)*cs_theta(1)
+  !end function Tbg
+
+  !function Tgb(cs_phi,cs_theta,cs_psi)
+  !  real(dp), dimension(2), intent(in) :: cs_phi, cs_theta, cs_psi  ! cos and sin
+  !  real(dp), dimension(3,3) :: Tgb
+  !  Tgb(1,1)=cs_psi(1)*cs_theta(1)
+  !  Tgb(1,2)=cs_phi(2)*cs_theta(2)*cs_psi(1)-cs_psi(2)*cs_phi(1)
+  !  Tgb(1,3)=cs_phi(2)*cs_psi(2)+cs_theta(2)*cs_phi(1)*cs_psi(1)
+  !  Tgb(2,1)=cs_psi(2)*cs_theta(1)
+  !  Tgb(2,2)=cs_phi(2)*cs_psi(2)*cs_theta(2)+cs_phi(1)*cs_psi(1)
+  !  Tgb(2,3)=cs_psi(2)*cs_theta(2)*cs_phi(1)-cs_phi(2)*cs_psi(1)
+  !  Tgb(3,1)=-cs_theta(2)
+  !  Tgb(3,2)=cs_phi(2)*cs_theta(1)
+  !  Tgb(3,3)=cs_phi(1)*cs_theta(1)
+  !end function Tgb
+
+  !|------+----------------------+------|
+  !| ++++ | Bookeeping functions | ++++ |
+  !|------+----------------------+------|
+
+  subroutine skiplines(fileunit,nlines)
+    integer, intent(in) :: fileunit,nlines
+    integer :: i
+    do i=1,nlines
+      read(fileunit,*)
+    enddo
+  end subroutine skiplines
 
 
 end module mymathlib
