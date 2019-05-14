@@ -263,7 +263,7 @@ program main
       else
         vind_wake_step=0.5_dp*(3._dp*vind_wake-vind_wake1)
         call convectwake(wake(row_now:nt,:),vind_wake_step(:,row_now:nt,:)*dt)
-        vind_wake1=vind_wake
+        vind_wake1=vind_wake_step
       endif
 
 
