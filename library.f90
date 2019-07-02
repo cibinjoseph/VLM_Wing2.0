@@ -6,8 +6,8 @@ module library
 
   ! Input parameters
   integer, parameter :: nt = 160
-  integer, parameter :: ns = 13
-  integer, parameter :: nc = 4
+  integer, parameter :: ns = 3
+  integer, parameter :: nc = 1
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
@@ -548,7 +548,7 @@ contains
    
     do j=1,size(wing_array,2)
       do i=1,size(wing_array,1)
-        wing_array(i,j)%velCPm=0._dp*uvw+cross3(pqr,wing_array(i,j)%cp-hub_coords)
+        wing_array(i,j)%velCPm=uvw+cross3(pqr,wing_array(i,j)%cp-hub_coords)
         wing_array(i,j)%velCP=wing_array(i,j)%velCPm+vind_panelgeo(wake_array,wing_array(i,j)%cp)
       enddo
     enddo
