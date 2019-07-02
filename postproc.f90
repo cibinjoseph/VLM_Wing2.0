@@ -240,7 +240,9 @@ contains
     open(unit=10,file=filename)
     write(10,*) '# Lift'
     do i=1,size(liftvec,1)
-      write(10,*) extra_params(1)*i,liftvec(i)/(1.2_dp*(extra_params(3)*extra_params(2))**2._dp*pi*extra_params(3)**2._dp)
+      !write(10,*) extra_params(1)*i,liftvec(i)/(1.2_dp*(extra_params(3)*extra_params(2))**2._dp*pi*extra_params(3)**2._dp)
+      ! DEBUG
+      write(10,*) extra_params(1)*i*10._dp,liftvec(i)/240._dp
     enddo
     close(10)
   end subroutine lift2file
