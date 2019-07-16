@@ -5,9 +5,9 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 160
-  integer, parameter :: ns = 13
-  integer, parameter :: nc = 4
+  integer, parameter :: nt = 5
+  integer, parameter :: ns = 42
+  integer, parameter :: nc = 12
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
