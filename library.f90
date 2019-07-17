@@ -109,22 +109,22 @@ contains
     if (isCPinsidecore(wing_array(1,1))) then
       print*,'Warning: CP inside vortex core at panel LU'
       print*,'Any key to continue. Ctrl-C to exit'
-      read(*,*)
+      !read(*,*)
     endif
     if (isCPinsidecore(wing_array(rows,1))) then
       print*,'Warning: CP inside vortex core at panel LB'
       print*,'Any key to continue. Ctrl-C to exit'
-      read(*,*)
+      !read(*,*)
     endif
     if (isCPinsidecore(wing_array(1,cols))) then
       print*,'Warning: CP inside vortex core at panel RU'
       print*,'Any key to continue. Ctrl-C to exit'
-      read(*,*)
+      !read(*,*)
     endif
     if (isCPinsidecore(wing_array(rows,cols))) then
       print*,'Warning: CP inside vortex core at panel RB'
       print*,'Any key to continue. Ctrl-C to exit'
-      read(*,*)
+      !read(*,*)
     endif
 
   end subroutine init_wing
