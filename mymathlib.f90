@@ -260,7 +260,7 @@ contains
 
     productMat=matmul(A,Ainv)
     isInverse=.TRUE.
-    tol=eps*1000._dp
+    tol=1E-6
 
     do j=1,size(A,2)
       do i=1,size(A,1)
@@ -426,6 +426,5 @@ contains
       read(fileunit,*)
     enddo
   end subroutine skiplines
-
 
 end module mymathlib

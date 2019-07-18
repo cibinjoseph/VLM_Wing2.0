@@ -92,7 +92,7 @@ program main
     do ichord=1,nc
       row=ichord+nc*(ispan-1)
       do j=1,ns       ! Vortex ring loop
-        do i=1,nc   
+        do i=1,nc
           col=i+nc*(j-1)
           vec_dummy=wing(i,j)%vr%vind(wing(ichord,ispan)%cp)
           Amat(row,col)=dot_product(vec_dummy,wing(ichord,ispan)%ncap)
@@ -102,6 +102,14 @@ program main
   enddo
 
   Amat_inv=inv(Amat)
+
+  ! DEBUG
+  !open(unit=22,file='mat12')
+  !do i=1,ns*nc
+  !  write(22,'(24ES14.3)'), (Amat(i,j),j=1,ns*nc)
+  !enddo
+  !close(22)
+  !stop
 
   ! Initial Solution
   if (slowstart_switch .eq. 0) then
@@ -131,6 +139,10 @@ program main
   else
     gamvec=0._dp
   endif
+  ! DEBUG
+  !print*,gamvec
+  !read*
+
 
   gamvec_prev=gamvec
 
