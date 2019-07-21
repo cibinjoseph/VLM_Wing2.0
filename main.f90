@@ -102,16 +102,6 @@ program main
   enddo
 
   Amat_inv=inv(Amat)
-  ! DEBUG
-  !do i=1,ns*nc
-  !  if (Amat_inv(i,j) > 15._dp) print*,i,j
-  !enddo
-  !open(unit=22,file='mat12')
-  !do i=1,ns*nc
-  !  write(22,'(24ES14.3)'), (Amat(i,j),j=1,ns*nc)
-  !enddo
-  !close(22)
-  !stop
 
   ! Initial Solution
   if (slowstart_switch .eq. 0) then
