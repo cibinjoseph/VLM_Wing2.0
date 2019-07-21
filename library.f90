@@ -151,33 +151,32 @@ contains
     wake_array%vr%gam=0._dp
 
     ! Assign core_radius to tip vortices
-    ! DEBUG
-    ! do i=1,rows
-    !   do j=1,3,2
-    !     ! Root vortex 
-    !     wake_array(i,1)%vr%vf(j)%r_vc0      = tip_core_radius 
-    !     wake_array(i,1)%vr%vf(j)%r_vc       = tip_core_radius 
+    do i=1,rows
+      do j=1,3,2
+        ! Root vortex 
+        wake_array(i,1)%vr%vf(j)%r_vc0      = tip_core_radius 
+        wake_array(i,1)%vr%vf(j)%r_vc       = tip_core_radius 
 
-    !     wake_array(i,2)%vr%vf(j)%r_vc0      = tip_core_radius 
-    !     wake_array(i,2)%vr%vf(j)%r_vc       = tip_core_radius 
+        wake_array(i,2)%vr%vf(j)%r_vc0      = tip_core_radius 
+        wake_array(i,2)%vr%vf(j)%r_vc       = tip_core_radius 
 
-    !     ! Tip vortex 
-    !     wake_array(i,cols)%vr%vf(j)%r_vc0   = tip_core_radius 
-    !     wake_array(i,cols)%vr%vf(j)%r_vc    = tip_core_radius 
+        ! Tip vortex 
+        wake_array(i,cols)%vr%vf(j)%r_vc0   = tip_core_radius 
+        wake_array(i,cols)%vr%vf(j)%r_vc    = tip_core_radius 
 
-    !     wake_array(i,cols-1)%vr%vf(j)%r_vc0 = tip_core_radius 
-    !     wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
-    !   enddo
+        wake_array(i,cols-1)%vr%vf(j)%r_vc0 = tip_core_radius 
+        wake_array(i,cols-1)%vr%vf(j)%r_vc  = tip_core_radius 
+      enddo
 
-    !   ! Root vortex outer region
-    !   wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
-    !   wake_array(i,3)%vr%vf(1)%r_vc       = tip_core_radius 
+      ! Root vortex outer region
+      wake_array(i,3)%vr%vf(1)%r_vc0      = tip_core_radius 
+      wake_array(i,3)%vr%vf(1)%r_vc       = tip_core_radius 
 
-    !   ! Tip  vortex outer region
-    !   wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
-    !   wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
+      ! Tip  vortex outer region
+      wake_array(i,cols-2)%vr%vf(3)%r_vc0 = tip_core_radius 
+      wake_array(i,cols-2)%vr%vf(3)%r_vc  = tip_core_radius 
 
-    ! enddo
+    enddo
 
     if (starting_vortex_core > eps) then
       ! Assign core_radius to starting vortices
