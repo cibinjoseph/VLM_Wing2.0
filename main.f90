@@ -131,10 +131,6 @@ program main
   else
     gamvec=0._dp
   endif
-  ! DEBUG
-  !print*,gamvec
-  !read*
-
 
   gamvec_prev=gamvec
 
