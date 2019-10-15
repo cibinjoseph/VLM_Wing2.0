@@ -335,7 +335,7 @@ program main
   enddo
 
   ! Postprocesing
-  call lift2file(lift,'Results/lift.curve',(/dt,0.5_dp*density*chord*span*vwind(1)*vwind(1)/))
+  call lift2file(lift,'Results/lift.curve',(/dt,0.5_dp*density*chord*span*om_body(3)*om_body(3)/))
   call drag2file(drag,'Results/drag.curve',(/dt,om_body(3),span,vwind(1)/))
 
   if (wakeplot_switch .eq. 1) call mesh2file(wing,wake(row_now:nt,:),'Results/wNw'//timestamp//'.tec')
