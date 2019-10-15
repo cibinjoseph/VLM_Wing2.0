@@ -225,7 +225,7 @@ contains
 
     write(10,*) '# Gamma'
     do i=1,ny
-      write(10,*) yvec_file(i), -1._dp*gam_sectional(i)
+      write(10,*) yvec_file(i), (-1._dp)*gam_sectional(i)
     enddo
     close(10)
 
