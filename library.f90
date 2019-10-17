@@ -5,9 +5,9 @@ module library
   implicit none
 
   ! Input parameters
-  integer, parameter :: nt = 160
-  integer, parameter :: ns = 26
-  integer, parameter :: nc = 4
+  integer, parameter :: nt = 150
+  integer, parameter :: ns = 13
+  integer, parameter :: nc = 1
 
   ! Global env parameters
   real(dp), parameter :: density = 1.2_dp
@@ -505,7 +505,7 @@ contains
     integer :: ii,jj,ifil
     oseen_param= 1.2564_dp
     kin_visc   = 0.0000181_dp
-    turb_visc  = 100._dp
+    turb_visc  = 1000._dp
 
     do jj=1,size(wake_array,2)
       do ii=1,size(wake_array,1)
