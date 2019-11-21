@@ -119,7 +119,7 @@ program main
         ! Pitch vel
         wing(ichord,ispan)%vel_pitch=thetadot*wing(ichord,ispan)%r_hinge
         RHS(indx)= RHS(indx)+wing(ichord,ispan)%vel_pitch
-
+!! what would change if we have a sweeping and pitching insect wing for calculation of RHS vector
         ! pqr vel
         RHS(indx)= RHS(indx)+dot_product(cross3(pqr,wing(ichord,ispan)%cp),wing(ichord,ispan)%ncap)
         indx=indx+1
