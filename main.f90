@@ -62,6 +62,7 @@ program main
   ! Initialize wake geometry and core radius
   call init_wake(wake,wake_mid_core,wake_tip_core,starting_vortex_core)
   gamvec_prev=0._dp
+  gam_sectional=0._dp
   vind_wake=0._dp
   vind_wake1=0._dp
   vind_wake2=0._dp
